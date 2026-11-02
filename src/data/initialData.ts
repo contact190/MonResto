@@ -1,4 +1,4 @@
-import { Category, ClientAccount, Employee, MenuItem, ModifierGroup, Order, RestaurantTable, RestoBranding, StockItem } from '../types';
+import type { Category, ClientAccount, Employee, MenuItem, ModifierGroup, Order, RestaurantTable, RestoBranding, StockItem } from '../types.ts';
 
 export const INITIAL_BRANDING: RestoBranding = {
   restaurantName: 'MonResto',

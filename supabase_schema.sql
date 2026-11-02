@@ -35,3 +35,4 @@ create policy "Allow public license verification and superadmin management"
   for all
   using (true)
   with check (true);
+
