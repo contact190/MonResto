@@ -1,0 +1,35 @@
+{
+  "name": "MonResto — Tout votre restaurant dans un seul logiciel",
+  "short_name": "MonResto",
+  "description": "Solution complète : Borne de commande Kiosk tactile, Caisse POS, Prise de commande serveur Mobile, Plan de salle, Menu & Stocks.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FDFBF7",
+  "theme_color": "#EA580C",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Borne de Commande (Kiosk)",
+      "short_name": "Borne Kiosk",
+      "description": "Ouvrir directement en mode Borne Client tactile",
+      "url": "/?mode=kiosk",
+      "icons": [{ "src": "/icon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Caisse POS & Serveur",
+      "short_name": "Caisse POS",
+      "description": "Ouvrir la caisse et prise de commande rapide",
+      "url": "/?mode=pos",
+      "icons": [{ "src": "/icon.svg", "sizes": "192x192" }]
+    }
+  ]
+}
+

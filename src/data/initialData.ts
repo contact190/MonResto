@@ -1,0 +1,551 @@
+import { Category, ClientAccount, Employee, MenuItem, ModifierGroup, Order, RestaurantTable, RestoBranding, StockItem } from '../types';
+
+export const INITIAL_BRANDING: RestoBranding = {
+  restaurantName: 'MonResto',
+  tagline: 'Préparé à la commande • Produits 100% Frais',
+  logoUrl: '/icon.svg',
+  heroBackgroundUrl:
+    'https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=1600&q=80',
+  specialOffers: [
+    {
+      id: 'off-1',
+      title: 'Menu Dzayer Smash Double + Frites Maison + Hamoud = 1 000 DA',
+      description: 'Économisez 150 DA sur la formule complète du midi et soir',
+      badge: 'OFFRE DU JOUR',
+      promoPriceDA: 1000,
+      active: true,
+    },
+    {
+      id: 'off-2',
+      title: '2 Pizzas Boisées Achetées = 1 Boisson 1L Offerte',
+      description: 'Valable sur place et à emporter sur toute la gamme Feu de Bois',
+      badge: 'PROMO FAMILLE',
+      promoPriceDA: 1700,
+      active: true,
+    },
+  ],
+  kioskAds: [
+    {
+      id: 'ad-1',
+      title: 'Hamoud Boualem & Selecto Bien Frais',
+      subtitle: 'Accompagnez votre repas avec le goût authentique depuis 1878 — Seulement 120 DA',
+      imageUrl:
+        'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=900&q=80',
+      sponsorTag: 'ESPACE PUB PARTENAIRE',
+      placement: 'both',
+      active: true,
+    },
+    {
+      id: 'ad-2',
+      title: 'Nouveau : Tiramisu Spéculoos & Caramel Maison',
+      subtitle: 'Préparé chaque matin par notre chef pâtissier — 380 DA',
+      imageUrl:
+        'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?auto=format&fit=crop&w=900&q=80',
+      sponsorTag: 'NOUVEAUTÉ GOURMANDE',
+      placement: 'menu_banner',
+      active: true,
+    },
+  ],
+};
+
+// Commercial Version: Super Admin starts with 0 clients (empty)
+export const INITIAL_CLIENTS: ClientAccount[] = [];
+
+// Commercial Version: Employees are created when a client license is provisioned by Super Admin
+export const INITIAL_EMPLOYEES: Employee[] = [];
+
+export const CATEGORIES: Category[] = [
+  { id: 'all', name: 'Tout le Menu', icon: 'Sparkles', description: 'Toute notre carte' },
+  { id: 'burgers', name: 'Burgers Gourmet', icon: 'Beef', description: 'Viande fraîche smashée & buns briochés' },
+  { id: 'tacos', name: 'Tacos Gratinés', icon: 'Sandwich', description: 'Sauce fromagère maison & gratinés au four' },
+  { id: 'pizzas', name: 'Pizzas Feu de Bois', icon: 'Pizza', description: 'Pâte artisanale maturée 48h' },
+  { id: 'assiettes', name: 'Plats & Grillades', icon: 'UtensilsCrossed', description: 'Servis avec accompagnements chauds' },
+  { id: 'sides', name: 'Frites & Entrées', icon: 'Flame', description: 'Snacks croustillants & salades' },
+  { id: 'drinks', name: 'Boissons Fraîches', icon: 'CupSoda', description: 'Sodas locaux, jus frais & eaux' },
+  { id: 'desserts', name: 'Desserts & Café', icon: 'IceCream', description: 'Douceurs gourmandes' },
+];
+
+export const COMMON_MODIFIERS: Record<string, ModifierGroup[]> = {
+  burger: [
+    {
+      id: 'formule',
+      name: 'Choix de Formule',
+      required: true,
+      multiSelect: false,
+      options: [
+        { id: 'seul', name: 'Burger Seul', price: 0 },
+        { id: 'menu_classique', name: 'Menu (Frites Maison + Boisson 33cl)', price: 250 },
+        { id: 'menu_cheddar', name: 'Menu XL (Frites Cheddar Bacon + Boisson)', price: 400 },
+      ],
+    },
+    {
+      id: 'sauces',
+      name: 'Sauces au choix (max 2)',
+      required: false,
+      multiSelect: true,
+      options: [
+        { id: 'algerienne', name: 'Sauce Algérienne', price: 0 },
+        { id: 'samourai', name: 'Sauce Samouraï', price: 0 },
+        { id: 'biggy', name: 'Sauce Burger Maison', price: 0 },
+        { id: 'fromagere', name: 'Sauce Fromagère', price: 50 },
+        { id: 'harissa', name: 'Harissa', price: 0 },
+      ],
+    },
+    {
+      id: 'supplements',
+      name: 'Suppléments Gourmands',
+      required: false,
+      multiSelect: true,
+      options: [
+        { id: 'sup_cheddar', name: 'Double Cheddar affiné', price: 100 },
+        { id: 'sup_oeuf', name: 'Œuf au plat', price: 80 },
+        { id: 'sup_boursin', name: 'Fromage Boursin / Ail & Fines Herbes', price: 120 },
+        { id: 'sup_steak', name: 'Steak Smashé supplémentaire (100g)', price: 300 },
+        { id: 'sup_dinde', name: 'Bacon de dinde fumée', price: 150 },
+      ],
+    },
+  ],
+  tacos: [
+    {
+      id: 'taille_tacos',
+      name: 'Taille du Tacos',
+      required: true,
+      multiSelect: false,
+      options: [
+        { id: 'taille_m', name: 'Taille M (1 Viande)', price: 0 },
+        { id: 'taille_l', name: 'Taille L (2 Viandes)', price: 250 },
+        { id: 'taille_xl', name: 'Taille XL (3 Viandes - Géant)', price: 500 },
+      ],
+    },
+    {
+      id: 'gratinage',
+      name: 'Gratinage au Four',
+      required: false,
+      multiSelect: false,
+      options: [
+        { id: 'sans_gratin', name: 'Classique (Non gratiné)', price: 0 },
+        { id: 'gratin_mozza', name: 'Gratiné Mozzarella', price: 150 },
+        { id: 'gratin_cheddar', name: 'Gratiné Cheddar & Dinde Fumée', price: 200 },
+      ],
+    },
+    {
+      id: 'sauces_tacos',
+      name: 'Sauces Intérieures',
+      required: false,
+      multiSelect: true,
+      options: [
+        { id: 'algerienne', name: 'Sauce Algérienne', price: 0 },
+        { id: 'samourai', name: 'Sauce Samouraï', price: 0 },
+        { id: 'blanche', name: 'Sauce Blanche aux herbes', price: 0 },
+        { id: 'barbecue', name: 'Sauce Barbecue Fumée', price: 0 },
+      ],
+    },
+  ],
+  pizza: [
+    {
+      id: 'taille_pizza',
+      name: 'Format de la Pizza',
+      required: true,
+      multiSelect: false,
+      options: [
+        { id: 'p_moyenne', name: 'Moyenne (30 cm - 1 à 2 pers.)', price: 0 },
+        { id: 'p_familiale', name: 'Familiale XL (40 cm - 3 à 4 pers.)', price: 450 },
+        { id: 'p_croute_fromage', name: 'Moyenne + Croûte Fourrée Fromage', price: 250 },
+      ],
+    },
+    {
+      id: 'extra_pizza',
+      name: 'Extras Pizza',
+      required: false,
+      multiSelect: true,
+      options: [
+        { id: 'ext_mozza', name: 'Extra Mozzarella', price: 150 },
+        { id: 'ext_olives', name: 'Olives noires & Huile d’olive pimentée', price: 50 },
+        { id: 'ext_oeuf', name: 'Œuf fermier', price: 80 },
+      ],
+    },
+  ],
+};
+
+export const INITIAL_MENU_ITEMS: MenuItem[] = [
+  // Burgers
+  {
+    id: 'b1',
+    code: 'BRG-01',
+    name: 'Le Dzayer Smash Double',
+    description: 'Double steak smashé 200g, double cheddar fondant, oignons caramélisés, pickles, sauce secrète Dzayer sur bun brioché toasté.',
+    price: 750,
+    categoryId: 'burgers',
+    image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80',
+    available: true,
+    popular: true,
+    prepTimeMin: 8,
+    modifierGroups: COMMON_MODIFIERS.burger,
+  },
+  {
+    id: 'b2',
+    code: 'BRG-02',
+    name: 'Crispy Chicken Suprême',
+    description: 'Filet de poulet fermier pané ultra-croustillant, cheddar, laitue iceberg, tomate et sauce miel-moutarde douce.',
+    price: 650,
+    categoryId: 'burgers',
+    image: 'https://images.unsplash.com/photo-1606755962773-d324e0a13086?auto=format&fit=crop&w=800&q=80',
+    available: true,
+    popular: true,
+    prepTimeMin: 7,
+    modifierGroups: COMMON_MODIFIERS.burger,
+  },
+  {
+    id: 'b3',
+    code: 'BRG-03',
+    name: 'Le Boursin Forestier',
+    description: 'Steak haché frais 150g, champignons sautés à la crème, fromage Boursin ail & fines herbes, dinde fumée.',
+    price: 800,
+    categoryId: 'burgers',
+    image: 'https://images.unsplash.com/photo-1586190848861-99aa4a171e90?auto=format&fit=crop&w=800&q=80',
+    available: true,
+    isNew: true,
+    prepTimeMin: 9,
+    modifierGroups: COMMON_MODIFIERS.burger,
+  },
+  {
+    id: 'b4',
+    code: 'BRG-04',
+    name: 'Spicy Harissa Volcano',
+    description: 'Double steak smashé, jalapeños marinés, cheddar pimenté, crispy onions et sauce mayo-harissa fumée.',
+    price: 750,
+    categoryId: 'burgers',
+    image: 'https://images.unsplash.com/photo-1553979459-d2229ba7433b?auto=format&fit=crop&w=800&q=80',
+    available: true,
+    spicy: true,
+    prepTimeMin: 8,
+    modifierGroups: COMMON_MODIFIERS.burger,
+  },
+
+  // Tacos
+  {
+    id: 't1',
+    code: 'TAC-01',
+    name: 'Tacos Royal Mixte Gratiné',
+    description: 'Poulet mariné, viande hachée épicée, cordon bleu, frites à l’intérieur et véritable sauce fromagère onctueuse.',
+    price: 650,
+    categoryId: 'tacos',
+    image: 'https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=800&q=80',
+    available: true,
+    popular: true,
+    prepTimeMin: 10,
+    modifierGroups: COMMON_MODIFIERS.tacos,
+  },
+  {
+    id: 't2',
+    code: 'TAC-02',
+    name: 'Tacos Poulet Tandoori & Boursin',
+    description: 'Émincé de poulet mariné tandoori, sauce fromagère au Boursin, poivrons grillés et frites maison.',
+    price: 600,
+    categoryId: 'tacos',
+    image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=800&q=80',
+    available: true,
+    prepTimeMin: 9,
+    modifierGroups: COMMON_MODIFIERS.tacos,
+  },
+  {
+    id: 't3',
+    code: 'TAC-03',
+    name: 'Tacos Merguez & Algérienne',
+    description: 'Merguez grillées, viande hachée, œuf, frites croustillantes, sauce fromagère et sauce algérienne piquante.',
+    price: 700,
+    categoryId: 'tacos',
+    image: 'https://images.unsplash.com/photo-1599974579688-8dbdd335c77f?auto=format&fit=crop&w=800&q=80',
+    available: true,
+    spicy: true,
+    prepTimeMin: 10,
+    modifierGroups: COMMON_MODIFIERS.tacos,
+  },
+
+  // Pizzas
+  {
+    id: 'p1',
+    code: 'PIZ-01',
+    name: 'Pizza Boisée Poulet Fumée',
+    description: 'Base crème fraîche, mozzarella fior di latte, poulet fumé, champignons frais, origan et filet d’huile d’olive.',
+    price: 850,
+    categoryId: 'pizzas',
+    image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80',
+    available: true,
+    popular: true,
+    prepTimeMin: 12,
+    modifierGroups: COMMON_MODIFIERS.pizza,
+  },
+  {
+    id: 'p2',
+    code: 'PIZ-02',
+    name: 'Pizza 4 Fromages Artisanal',
+    description: 'Sauce tomate San Marzano, mozzarella, cheddar affiné, gorgonzola doux, gouda au cumin et olives noires.',
+    price: 900,
+    categoryId: 'pizzas',
+    image: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=800&q=80',
+    available: true,
+    prepTimeMin: 11,
+    modifierGroups: COMMON_MODIFIERS.pizza,
+  },
+  {
+    id: 'p3',
+    code: 'PIZ-03',
+    name: 'Pizza Méditerranéenne Thon & Poivrons',
+    description: 'Sauce tomate parfumée au thym, thon entier, poivrons grillés, oignons rouges, câpres, olives et mozzarella.',
+    price: 750,
+    categoryId: 'pizzas',
+    image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=800&q=80',
+    available: true,
+    prepTimeMin: 11,
+    modifierGroups: COMMON_MODIFIERS.pizza,
+  },
+
+  // Plats & Grillades
+  {
+    id: 'a1',
+    code: 'PLT-01',
+    name: 'Assiette Brochettes Mixte Grill',
+    description: 'Brochettes de poulet mariné, côtelettes d’agneau et merguez grillées au charbon. Servie avec riz safrané, frites et salade.',
+    price: 1450,
+    categoryId: 'assiettes',
+    image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80',
+    available: true,
+    popular: true,
+    prepTimeMin: 15,
+  },
+  {
+    id: 'a2',
+    code: 'PLT-02',
+    name: 'Escalope Milanaise Gratinée',
+    description: 'Escalope de poulet panée nappée de sauce forestière aux champignons et gratinée au fromage, accompagnée de frites maison.',
+    price: 1100,
+    categoryId: 'assiettes',
+    image: 'https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?auto=format&fit=crop&w=800&q=80',
+    available: true,
+    prepTimeMin: 14,
+  },
+
+  // Sides / Entrées
+  {
+    id: 's1',
+    code: 'SID-01',
+    name: 'Barquette Frites Cheddar & Dinde Fumée',
+    description: 'Frites maison dorées, nappage généreux de sauce cheddar chaude et éclats de dinde fumée croustillante.',
+    price: 400,
+    categoryId: 'sides',
+    image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=800&q=80',
+    available: true,
+    popular: true,
+    prepTimeMin: 5,
+  },
+  {
+    id: 's2',
+    code: 'SID-02',
+    name: 'Tenders de Poulet Croustillants (5 pcs)',
+    description: 'Aiguillettes de filet de poulet marinées et panées aux céréales, servies avec sauce barbecue ou fromagère.',
+    price: 550,
+    categoryId: 'sides',
+    image: 'https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=800&q=80',
+    available: true,
+    prepTimeMin: 6,
+  },
+  {
+    id: 's3',
+    code: 'SID-03',
+    name: 'Salade César Poulet Grillé',
+    description: 'Cœur de laitue romaine, poulet grillé, copeaux de parmesan, croûtons à l’ail, œuf mollet et sauce César maison.',
+    price: 650,
+    categoryId: 'sides',
+    image: 'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?auto=format&fit=crop&w=800&q=80',
+    available: true,
+    prepTimeMin: 6,
+  },
+
+  // Boissons
+  {
+    id: 'd1',
+    code: 'DRK-01',
+    name: 'Hamoud Boualem / Selecto (33cl)',
+    description: 'L’authentique soda algérien bien frais : Hamoud La Blanche ou Selecto au choix.',
+    price: 120,
+    categoryId: 'drinks',
+    image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=800&q=80',
+    available: true,
+    popular: true,
+    prepTimeMin: 1,
+  },
+  {
+    id: 'd2',
+    code: 'DRK-02',
+    name: 'Mojito Virgin Menthe & Citron Pressé',
+    description: 'Préparé minute avec feuilles de menthe fraîche, citron vert pressé, glace pilée et eau pétillante.',
+    price: 300,
+    categoryId: 'drinks',
+    image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=800&q=80',
+    available: true,
+    isNew: true,
+    prepTimeMin: 3,
+  },
+  {
+    id: 'd3',
+    code: 'DRK-03',
+    name: 'Jus d’Orange Naturel Pressé',
+    description: '100% oranges fraîches pressées à la commande, sans sucre ajouté.',
+    price: 280,
+    categoryId: 'drinks',
+    image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=800&q=80',
+    available: true,
+    prepTimeMin: 3,
+  },
+  {
+    id: 'd4',
+    code: 'DRK-04',
+    name: 'Eau Minérale (Ifri / Lalla Khedidja 50cl)',
+    description: 'Bouteille d’eau minérale naturelle fraîche 50cl.',
+    price: 60,
+    categoryId: 'drinks',
+    image: 'https://images.unsplash.com/photo-1548839140-29a749e1cf4d?auto=format&fit=crop&w=800&q=80',
+    available: true,
+    prepTimeMin: 1,
+  },
+
+  // Desserts
+  {
+    id: 'ds1',
+    code: 'DES-01',
+    name: 'Tiramisu Spéculoos & Caramel',
+    description: 'Crème mascarpone légère montée maison, biscuits spéculoos croustillants et coulis caramel beurre salé.',
+    price: 380,
+    categoryId: 'desserts',
+    image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?auto=format&fit=crop&w=800&q=80',
+    available: true,
+    popular: true,
+    prepTimeMin: 2,
+  },
+  {
+    id: 'ds2',
+    code: 'DES-02',
+    name: 'Fondant au Chocolat Noir Cœur Coulant',
+    description: 'Servi tiède avec sa boule de glace vanille de Madagascar et éclats de noisettes torréfiées.',
+    price: 420,
+    categoryId: 'desserts',
+    image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=800&q=80',
+    available: true,
+    prepTimeMin: 4,
+  },
+];
+
+export const INITIAL_MODIFIER_GROUPS: ModifierGroup[] = [
+  ...COMMON_MODIFIERS.burger,
+  ...COMMON_MODIFIERS.tacos,
+  ...COMMON_MODIFIERS.pizza,
+];
+
+export const INITIAL_TABLES: RestaurantTable[] = [
+  // Salle Principale
+  { id: 'tbl-1', name: 'Table 01', zone: 'Salle Principale', capacity: 2, status: 'libre' },
+  { id: 'tbl-2', name: 'Table 02', zone: 'Salle Principale', capacity: 4, status: 'libre' },
+  { id: 'tbl-3', name: 'Table 03', zone: 'Salle Principale', capacity: 4, status: 'libre' },
+  { id: 'tbl-4', name: 'Table 04', zone: 'Salle Principale', capacity: 6, status: 'libre' },
+  { id: 'tbl-5', name: 'Table 05', zone: 'Salle Principale', capacity: 2, status: 'libre' },
+  { id: 'tbl-6', name: 'Table 06', zone: 'Salle Principale', capacity: 4, status: 'libre' },
+  // Terrasse
+  { id: 'tbl-7', name: 'Terrasse 01', zone: 'Terrasse', capacity: 4, status: 'libre' },
+  { id: 'tbl-8', name: 'Terrasse 02', zone: 'Terrasse', capacity: 4, status: 'libre' },
+  { id: 'tbl-9', name: 'Terrasse 03', zone: 'Terrasse', capacity: 6, status: 'libre' },
+  // Espace Famille
+  { id: 'tbl-10', name: 'Salon Famille A', zone: 'Espace Famille', capacity: 8, status: 'libre' },
+  { id: 'tbl-11', name: 'Salon Famille B', zone: 'Espace Famille', capacity: 6, status: 'libre' },
+];
+
+// Commercial Version: Starts with 0 orders
+export const INITIAL_ORDERS: Order[] = [];
+
+export const INITIAL_STOCK_ITEMS: StockItem[] = [
+  {
+    id: 'stk-1',
+    name: 'Steak Haché Frais Pur Bœuf',
+    category: 'Viandes & Volailles',
+    quantity: 14.5,
+    unit: 'kg',
+    minThreshold: 5,
+    costPerUnit: 1850,
+    lastUpdated: 'Aujourd’hui, 09:00',
+  },
+  {
+    id: 'stk-2',
+    name: 'Filet de Poulet Fermier',
+    category: 'Viandes & Volailles',
+    quantity: 11.0,
+    unit: 'kg',
+    minThreshold: 4,
+    costPerUnit: 920,
+    lastUpdated: 'Aujourd’hui, 09:00',
+  },
+  {
+    id: 'stk-3',
+    name: 'Galettes Tortilla Tacos XL (30cm)',
+    category: 'Pains & Pâtes',
+    quantity: 18,
+    unit: 'paquets',
+    minThreshold: 20,
+    costPerUnit: 450,
+    lastUpdated: 'Hier, 22:30',
+  },
+  {
+    id: 'stk-4',
+    name: 'Buns Briochés Artisanal',
+    category: 'Pains & Pâtes',
+    quantity: 85,
+    unit: 'pièces',
+    minThreshold: 30,
+    costPerUnit: 45,
+    lastUpdated: 'Aujourd’hui, 08:30',
+  },
+  {
+    id: 'stk-5',
+    name: 'Mozzarella Fior Di Latte',
+    category: 'Fromages & Sauces',
+    quantity: 3.2,
+    unit: 'kg',
+    minThreshold: 4,
+    costPerUnit: 1400,
+    lastUpdated: 'Aujourd’hui, 14:00',
+  },
+  {
+    id: 'stk-6',
+    name: 'Sauce Algérienne Maison',
+    category: 'Fromages & Sauces',
+    quantity: 6.5,
+    unit: 'L',
+    minThreshold: 2,
+    costPerUnit: 650,
+    lastUpdated: 'Aujourd’hui, 11:00',
+  },
+  {
+    id: 'stk-7',
+    name: 'Canettes Hamoud Boualem / Selecto 33cl',
+    category: 'Boissons',
+    quantity: 120,
+    unit: 'canettes',
+    minThreshold: 36,
+    costPerUnit: 65,
+    lastUpdated: 'Aujourd’hui, 10:00',
+  },
+  {
+    id: 'stk-8',
+    name: 'Boîtes Burger & Sacs Kraft À Emporter',
+    category: 'Emballages',
+    quantity: 42,
+    unit: 'lots',
+    minThreshold: 50,
+    costPerUnit: 350,
+    lastUpdated: 'Hier, 19:00',
+  },
+];
+
+export const formatDA = (amount: number): string => {
+  return `${amount.toLocaleString('fr-DZ')} DA`;
+};
+
