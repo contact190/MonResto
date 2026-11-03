@@ -2,12 +2,53 @@
   "name": "monresto-pos-kiosk",
   "private": true,
   "version": "1.0.0",
+  "main": "electron/main.cjs",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --experimental-strip-types --test scripts/test_all_flows.ts"
+    "test": "node --experimental-strip-types --test scripts/test_all_flows.ts",
+    "electron:build": "vite build && electron-builder",
+    "dist": "vite build && electron-builder --win nsis --ia32 --x64",
+    "dist:portable": "vite build && electron-builder --win portable --ia32 --x64"
+  },
+  "build": {
+    "appId": "com.monresto.pos",
+    "productName": "MonResto Pro",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "public/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "ia32",
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "ia32",
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "MonResto Pro"
+    }
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
@@ -19,10 +60,11 @@
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
+    "electron": "^22.3.27",
+    "electron-builder": "^24.13.3",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.15",
     "typescript": "^5.6.3",
     "vite": "^6.0.1"
   }
 }
-

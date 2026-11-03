@@ -191,4 +191,22 @@ export type ViewportSimulation =
   | 'kiosk_landscape'
   | 'mobile_waiter';
 
+export interface PrinterSettings {
+  caissePrinterName: string; // Nom de l'imprimante thermique pour tickets caisse client
+  cuisinePrinterName: string; // Nom de l'imprimante thermique pour tickets cuisine/KDS
+  paperWidth: '80mm' | '58mm';
+  autoPrintCaisse: boolean; // Impression automatique dès l'encaissement
+  autoPrintCuisine: boolean; // Impression automatique dès validation de commande
+  cutPaper: boolean; // Commande massicot automatique
+  headerNote?: string;
+  footerNote?: string;
+}
+
+export interface PrinterDevice {
+  name: string;
+  displayName: string;
+  description?: string;
+  isDefault?: boolean;
+}
+
 

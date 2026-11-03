@@ -13,6 +13,7 @@ import {
   OrderSource,
   OrderStatus,
   PaymentMethod,
+  PrinterSettings,
   RestaurantTable,
   RestoBranding,
   StockItem,
@@ -37,6 +38,11 @@ import {
   upsertCloudLicense,
   verifyAdminCodeInCloud,
 } from '../lib/supabaseLicenseCloud';
+import {
+  executePrintJob,
+  getSavedPrinterSettings,
+  savePrinterSettings,
+} from '../lib/thermalPrinter';
 
 interface RestoContextType {
   // Navigation & Viewport
@@ -137,6 +143,10 @@ interface RestoContextType {
   // Notification toast
   toastMessage: string | null;
   showToast: (msg: string) => void;
+
+  // Thermal Printers Configuration
+  printerSettings: PrinterSettings;
+  updatePrinterSettings: (settings: Partial<PrinterSettings>) => void;
 }
 
 const RestoContext = createContext<RestoContextType | undefined>(undefined);
@@ -204,6 +214,17 @@ export const RestoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Minimal Cloud Supabase Configuration
   const [supabaseConfig, setSupabaseConfig] = useState<SupabaseCloudConfig>(getSavedSupabaseConfig);
+
+  // Thermal Printer Settings (POS Caisse & KDS Cuisine)
+  const [printerSettings, setPrinterSettings] = useState<PrinterSettings>(getSavedPrinterSettings);
+
+  const updatePrinterSettings = (newSettings: Partial<PrinterSettings>) => {
+    setPrinterSettings((prev) => {
+      const updated = { ...prev, ...newSettings };
+      savePrinterSettings(updated);
+      return updated;
+    });
+  };
 
   const [clients, setClients] = useState<ClientAccount[]>(() => {
     try {
@@ -1153,6 +1174,14 @@ export const RestoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       );
     }
 
+    // Auto-print thermal tickets if enabled
+    if (params.paid && printerSettings.autoPrintCaisse) {
+      executePrintJob('caisse', newOrder, branding, activeClient, printerSettings).catch(() => {});
+    }
+    if (printerSettings.autoPrintCuisine) {
+      executePrintJob('cuisine', newOrder, branding, activeClient, printerSettings).catch(() => {});
+    }
+
     return newOrder;
   };
 
@@ -1212,6 +1241,18 @@ export const RestoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         return o;
       })
     );
+    const target = orders.find((o) => o.id === orderId);
+    if (target && printerSettings.autoPrintCaisse) {
+      const updatedOrder: Order = {
+        ...target,
+        paid: true,
+        paymentMethod,
+        cashReceived,
+        changeGiven: cashReceived && cashReceived >= target.total ? cashReceived - target.total : 0,
+        cashedByEmployeeName: currentEmployee?.name || 'Caissier',
+      };
+      executePrintJob('caisse', updatedOrder, branding, activeClient, printerSettings).catch(() => {});
+    }
     showToast(`✅ Encaissé par ${currentEmployee?.name || 'Caissier'}`);
   };
 
@@ -1281,6 +1322,8 @@ export const RestoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         markOrderPaid,
         toastMessage,
         showToast,
+        printerSettings,
+        updatePrinterSettings,
       }}
     >
       {children}

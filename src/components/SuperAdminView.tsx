@@ -58,6 +58,82 @@ export const SuperAdminView: React.FC = () => {
   const [sbUrl, setSbUrl] = useState(supabaseConfig.url);
   const [sbKey, setSbKey] = useState(supabaseConfig.anonKey);
   const [sbEnabled, setSbEnabled] = useState(supabaseConfig.enabled);
+  const [testStatus, setTestStatus] = useState<{
+    status: 'idle' | 'testing' | 'success' | 'table_missing' | 'error';
+    message?: string;
+  }>({ status: 'idle' });
+  const [copiedSql, setCopiedSql] = useState<boolean>(false);
+
+  const sqlScript = `-- ============================================================================
+-- MONRESTO COMMERCIAL — ARCHITECTURE CLOUD MINIMALE (SUPABASE)
+-- ============================================================================
+create table if not exists public.client_licenses (
+  id text primary key,
+  restaurant_name text not null,
+  owner_name text not null,
+  phone text not null,
+  city text not null default 'Alger',
+  plan text not null check (plan in ('demo', 'mensuel', 'annuel', 'a_vie')),
+  plan_locked_forever boolean not null default false,
+  shutoff boolean not null default false,
+  shutoff_reason text,
+  admin_pin_code text not null,
+  license_key text not null unique,
+  max_staff_quota integer not null default 3 check (max_staff_quota >= 1),
+  activated_at timestamptz not null default now(),
+  expires_at timestamptz,
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_client_licenses_admin_pin on public.client_licenses (admin_pin_code);
+create index if not exists idx_client_licenses_key on public.client_licenses (license_key);
+
+alter table public.client_licenses enable row level security;
+
+create policy "Allow all operations" on public.client_licenses for all using (true) with check (true);
+`;
+
+  const handleTestSupabase = async () => {
+    if (!sbUrl || !sbKey) {
+      setTestStatus({ status: 'error', message: 'Veuillez renseigner l’URL et la clé' });
+      return;
+    }
+    setTestStatus({ status: 'testing', message: 'Test de connexion en cours...' });
+    try {
+      const cleanUrl = sbUrl.replace(/\/$/, '');
+      const res = await fetch(`${cleanUrl}/rest/v1/client_licenses?select=*&limit=1`, {
+        headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` },
+      });
+      if (res.ok) {
+        setTestStatus({
+          status: 'success',
+          message: '🟢 Connecté avec succès à Supabase ! Table "client_licenses" prête.',
+        });
+      } else if (res.status === 404) {
+        setTestStatus({
+          status: 'table_missing',
+          message:
+            '⚠️ Projet en ligne ! Mais la table "client_licenses" n’existe pas encore. Cliquez sur "Copier Script SQL" ci-dessous et collez-le dans le SQL Editor de Supabase.',
+        });
+      } else {
+        setTestStatus({
+          status: 'error',
+          message: `🔴 Erreur ${res.status}: Clé API ou permissions incorrectes.`,
+        });
+      }
+    } catch (e: any) {
+      setTestStatus({
+        status: 'error',
+        message: `🔴 Erreur réseau : ${e?.message || 'Impossible de joindre Supabase'}`,
+      });
+    }
+  };
+
+  const handleCopySql = () => {
+    navigator.clipboard?.writeText(sqlScript);
+    setCopiedSql(true);
+    setTimeout(() => setCopiedSql(false), 3000);
+  };
 
   // DOUBLE VALIDATION MODAL FOR "À VIE" (LIFETIME LICENSE - IRREVERSIBLE)
   const [lifetimeTargetClient, setLifetimeTargetClient] = useState<ClientAccount | null>(null);
@@ -911,6 +987,43 @@ export const SuperAdminView: React.FC = () => {
                   Activer la synchronisation Cloud Supabase des licences Admin
                 </span>
               </label>
+
+              {/* Ping Connection Test & Status Alert */}
+              <div className="pt-2 border-t border-stone-800 space-y-2.5">
+                <div className="flex items-center justify-between gap-2">
+                  <button
+                    type="button"
+                    onClick={handleTestSupabase}
+                    className="px-3.5 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-amber-300 font-extrabold text-xs flex items-center gap-1.5 border border-stone-700 transition"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${testStatus.status === 'testing' ? 'animate-spin' : ''}`} />
+                    Tester la Connexion Supabase
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleCopySql}
+                    className="px-3.5 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 font-bold text-xs flex items-center gap-1.5 border border-stone-700 transition"
+                  >
+                    <Copy className="w-3.5 h-3.5 text-emerald-400" />
+                    {copiedSql ? 'SQL Copié !' : 'Copier Script SQL'}
+                  </button>
+                </div>
+
+                {testStatus.status !== 'idle' && (
+                  <div
+                    className={`p-3 rounded-xl text-xs font-bold border ${
+                      testStatus.status === 'success'
+                        ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300'
+                        : testStatus.status === 'table_missing'
+                        ? 'bg-amber-500/15 border-amber-500/40 text-amber-300'
+                        : 'bg-red-500/15 border-red-500/40 text-red-300'
+                    }`}
+                  >
+                    {testStatus.message}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="p-4 bg-stone-950 border-t border-stone-800 flex gap-2">

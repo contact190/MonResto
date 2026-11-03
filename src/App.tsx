@@ -12,6 +12,7 @@ import {
   MonitorSmartphone,
   Package,
   Power,
+  Printer,
   Smartphone,
   Store,
   Tablet,
@@ -28,6 +29,7 @@ import { KitchenKDSView } from './components/KitchenKDSView';
 import { SuperAdminView } from './components/SuperAdminView';
 import { PinLockScreen } from './components/PinLockScreen';
 import { PWAInstallModal } from './components/PWAInstallModal';
+import { PrinterSettingsModal } from './components/PrinterSettingsModal';
 import { AppView, EmployeeRole } from './types';
 
 const MainLayout: React.FC = () => {
@@ -53,6 +55,7 @@ const MainLayout: React.FC = () => {
 
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isPWAModalOpen, setIsPWAModalOpen] = useState(false);
+  const [isPrinterModalOpen, setIsPrinterModalOpen] = useState(false);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -405,6 +408,17 @@ const MainLayout: React.FC = () => {
               <span className="hidden xl:inline">App</span>
             </button>
 
+            {currentEmployee.role === 'admin' && (
+              <button
+                onClick={() => setIsPrinterModalOpen(true)}
+                className="p-2 sm:px-2.5 sm:py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-200 text-xs font-extrabold flex items-center gap-1 transition"
+                title="Configurer les Imprimantes Tickets Caisse & Cuisine"
+              >
+                <Printer className="w-3.5 h-3.5 text-stone-700" />
+                <span className="hidden xl:inline">Imprimantes</span>
+              </button>
+            )}
+
             {/* Lock / Switch Employee PIN Button (Opens Internal Staff Terminal) */}
             <button
               onClick={() => {
@@ -459,6 +473,12 @@ const MainLayout: React.FC = () => {
         onClose={() => setIsPWAModalOpen(false)}
         deferredPrompt={deferredPrompt}
         onTriggerInstall={handleTriggerInstall}
+      />
+
+      {/* Thermal POS Printer Configuration Modal */}
+      <PrinterSettingsModal
+        isOpen={isPrinterModalOpen}
+        onClose={() => setIsPrinterModalOpen(false)}
       />
     </div>
   );

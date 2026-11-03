@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { formatDA } from '../data/initialData';
 import { useResto } from '../context/RestoContext';
+import { executePrintJob } from '../lib/thermalPrinter';
 import { Order } from '../types';
 
 interface TicketPrintModalProps {
@@ -21,8 +22,9 @@ interface TicketPrintModalProps {
 }
 
 export const TicketPrintModal: React.FC<TicketPrintModalProps> = ({ order, onClose }) => {
-  const { branding, activeClient } = useResto();
+  const { branding, activeClient, printerSettings, showToast } = useResto();
   const [viewMode, setViewMode] = useState<'both' | 'caisse' | 'cuisine'>('both');
+  const [isPrinting, setIsPrinting] = useState<boolean>(false);
 
   if (!order) return null;
 
@@ -42,11 +44,23 @@ export const TicketPrintModal: React.FC<TicketPrintModalProps> = ({ order, onClo
     return 'LIVRAISON CLIENT';
   };
 
-  const handlePrint = (target: 'both' | 'caisse' | 'cuisine') => {
+  const handlePrint = async (target: 'both' | 'caisse' | 'cuisine') => {
+    setIsPrinting(true);
     setViewMode(target);
-    setTimeout(() => {
+
+    try {
+      if (target === 'caisse' || target === 'both') {
+        await executePrintJob('caisse', order, branding, activeClient, printerSettings);
+      }
+      if (target === 'cuisine' || target === 'both') {
+        await executePrintJob('cuisine', order, branding, activeClient, printerSettings);
+      }
+      showToast('Impression thermique envoyée !');
+    } catch {
       window.print();
-    }, 100);
+    } finally {
+      setIsPrinting(false);
+    }
   };
 
   return (

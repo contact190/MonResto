@@ -245,3 +245,4 @@ describe('FLUX 7: Clôture de Caisse, Suivi Nominatif & Tiroir Espèces', () => 
     assert.equal(order.cashedByEmployeeName, 'Amine (Caisse Principale)', 'Caissier identifié');
   });
 });
+
